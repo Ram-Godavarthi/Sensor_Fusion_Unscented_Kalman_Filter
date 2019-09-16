@@ -1,23 +1,16 @@
 #ifndef UKF_H
 #define UKF_H
-
-#include<iostream>
+#include <iostream>
 #include "Eigen/Dense"
 #include "measurement_package.h"
+using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using namespace std;
 
 class UKF {
- public:
-  /**
-   * Constructor
-   */
-  UKF();
+public:
 
-  /**
-   * Destructor
-   */
+  UKF();
   virtual ~UKF();
 
   /**
@@ -45,7 +38,6 @@ class UKF {
    */
   void UpdateRadar(MeasurementPackage meas_package);
 
-
   // initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
 
@@ -61,11 +53,23 @@ class UKF {
   // state covariance matrix
   Eigen::MatrixXd P_;
 
+  // LiDAR measurement matrix
+  Eigen::MatrixXd H_;
+
+  // LiDAR measurement covariance
+  Eigen::MatrixXd R_;
+
   // predicted sigma points matrix
   Eigen::MatrixXd Xsig_pred_;
 
   // time when the state is true, in us
   long long time_us_;
+  double delta_t_;
+  size_t previous_timestamp_;
+
+
+  VectorXd radarmeasure;
+  VectorXd lidarmeasure;
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
   double std_a_;
@@ -93,25 +97,24 @@ class UKF {
 
   // State dimension
   int n_x_;
-
-  int n_z;
+  int n_z_;
 
   // Augmented state dimension
   int n_aug_;
+  // Define Column lenght
+  int col_len;
 
   // Sigma point spreading parameter
   double lambda_;
 
-  double delta_t;
-  VectorXd radarMeasuredInput_;
-  VectorXd lidarMeasuredInput_;
+private:
+  void SigmaPointsGeneration(Eigen::MatrixXd* Xsig_out);
+  void SigmaPointsAugmentation(Eigen::MatrixXd* Xsig_out);
+  void SigmaPointsPrediction(const Eigen::MatrixXd &Xsig_aug, const double &delta_t, Eigen::MatrixXd* Xsig_out);
+  void MeanCovariancePrediction(const Eigen::MatrixXd &Xsig_pred, Eigen::VectorXd* x_pred, Eigen::MatrixXd* P_pred);
+  void RadarMeasurementsPrediction(const Eigen::MatrixXd &Xsig_pred,Eigen::MatrixXd* zsig_out, Eigen::VectorXd* z_out, Eigen::MatrixXd* S_out);
+  void UpdateRadarState(const Eigen::MatrixXd &Xsig_pred, const Eigen::MatrixXd &Zsig, const Eigen::VectorXd &z_pred, const Eigen::MatrixXd &S);
 
-  void GenerateSigmaPoints(Eigen::MatrixXd* Xsig_out);
-  void AugmentedSigmaPoints(MatrixXd* Xsig_out);
-  void SigmaPointPrediction(const MatrixXd &Xsig_aug, MatrixXd* Xsig_out, const double &delta_t);
-  void PredictMeanAndCovariance(const MatrixXd &Xsig_pred, VectorXd* x_pred, MatrixXd* P_pred);
-  void PredictRadarMeasurement(const int n_z, const MatrixXd &Xsig_pred, MatrixXd* Zsig_out, VectorXd* z_out, MatrixXd* S_out);
-  void UpdateState(MatrixXd &Xsig_pred, const MatrixXd &Zsig, const VectorXd &z_pred, const MatrixXd &S);
 };
 
 #endif  // UKF_H
