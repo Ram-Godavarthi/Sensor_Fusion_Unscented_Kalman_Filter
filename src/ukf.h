@@ -1,5 +1,6 @@
 #ifndef UKF_H
 #define UKF_H
+
 #include <iostream>
 #include "Eigen/Dense"
 #include "measurement_package.h"
@@ -67,7 +68,7 @@ public:
   double delta_t_;
   size_t previous_timestamp_;
 
-
+  //Two vectors to store Sensor data
   VectorXd radarmeasure;
   VectorXd lidarmeasure;
 
@@ -101,12 +102,13 @@ public:
 
   // Augmented state dimension
   int n_aug_;
-  // Define Column lenght
+  // Define Column lenght to simplify the equations
   int col_len;
 
   // Sigma point spreading parameter
   double lambda_;
 
+  //Created these functions to access privately
 private:
   void SigmaPointsGeneration(Eigen::MatrixXd* Xsig_out);
   void SigmaPointsAugmentation(Eigen::MatrixXd* Xsig_out);
