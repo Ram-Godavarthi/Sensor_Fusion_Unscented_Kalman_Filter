@@ -1,8 +1,12 @@
 #ifndef UKF_H
 #define UKF_H
 
+#include<iostream>
 #include "Eigen/Dense"
 #include "measurement_package.h"
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+using namespace std;
 
 class UKF {
  public:
@@ -90,11 +94,24 @@ class UKF {
   // State dimension
   int n_x_;
 
+  int n_z;
+
   // Augmented state dimension
   int n_aug_;
 
   // Sigma point spreading parameter
   double lambda_;
+
+  double delta_t;
+  VectorXd radarMeasuredInput_;
+  VectorXd lidarMeasuredInput_;
+
+  void GenerateSigmaPoints(Eigen::MatrixXd* Xsig_out);
+  void AugmentedSigmaPoints(MatrixXd* Xsig_out);
+  void SigmaPointPrediction(const MatrixXd &Xsig_aug, MatrixXd* Xsig_out, const double &delta_t);
+  void PredictMeanAndCovariance(const MatrixXd &Xsig_pred, VectorXd* x_pred, MatrixXd* P_pred);
+  void PredictRadarMeasurement(const int n_z, const MatrixXd &Xsig_pred, MatrixXd* Zsig_out, VectorXd* z_out, MatrixXd* S_out);
+  void UpdateState(MatrixXd &Xsig_pred, const MatrixXd &Zsig, const VectorXd &z_pred, const MatrixXd &S);
 };
 
 #endif  // UKF_H
