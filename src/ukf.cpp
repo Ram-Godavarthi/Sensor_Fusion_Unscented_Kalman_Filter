@@ -1,8 +1,6 @@
 #include "ukf.h"
 #include "Eigen/Dense"
 
-//#include <iostream>
-
 /**
  * Initializes Unscented Kalman filter
  */
